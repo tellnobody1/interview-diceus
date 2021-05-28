@@ -5,7 +5,7 @@ run / fork := true
 libraryDependencies ++= Seq(
   "com.typesafe.akka" % "akka-actor-typed_2.13" % "2.6.14"
 , "com.typesafe.akka" % "akka-stream_2.13" % "2.6.14"
-, "com.typesafe.akka" % "akka-http-core_2.13" % "10.2.4"
+, "com.typesafe.akka" % "akka-http_2.13" % "10.2.4"
 )
 
 dependsOn(proto)
