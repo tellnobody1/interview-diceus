@@ -1,19 +1,19 @@
 package http
 
-import akka.http.scaladsl.model.Uri
 import akka.actor.typed.ActorSystem
 import akka.Done
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.model.HttpMethod
 import akka.http.scaladsl.model.HttpMethods.GET
 import akka.http.scaladsl.model.StatusCodes.{NotImplemented, NotFound}
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import akka.stream.scaladsl.{Flow, GraphDSL}
+import akka.http.scaladsl.model.Uri
 import akka.stream.{FlowShape, Materializer}
+import akka.stream.scaladsl.{Flow, GraphDSL}
 import scala.concurrent.{Future}
-import scala.util.Failure
 import scala.concurrent.ExecutionContext
+import scala.util.Failure
 
 class Binder(using ActorSystem[Unit]):
   type Hr = HttpRequest
