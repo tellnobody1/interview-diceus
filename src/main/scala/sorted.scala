@@ -2,11 +2,13 @@ package sorted
 
 import store.Store
 import scala.annotation.tailrec
+import scala.math.Ordering
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 type Key = store.Key
 case class Node[A](left: Option[Key], x: A, right: Option[Key])
 
-class Sorted[A](store: Store[Node[A]])(index: A => Int):
+class Sorted[A, I: Ordering](store: Store[Node[A]])(index: A => I):
 
   def insert(x: A): Unit =
     store.get(store.head) match
@@ -59,12 +61,12 @@ class Sorted[A](store: Store[Node[A]])(index: A => Int):
 // @main
 def test(): Unit =
   import codec.{Codec, given}
-  val sorted = Sorted[String](Store[Node[String]]())(_.toInt)
-  assert(sorted.flatten == Nil)
-  sorted.insert("5")
-  assert(sorted.flatten == List("5"))
-  sorted.insert("7")
-  sorted.insert("4")
-  sorted.insert("6")
-  assert(sorted.flatten == List("4", "5", "6", "7"))
+  import schema.Product
+  val sorted1 = Sorted[Product, Long](Store())(_.click)
+  sorted1.insert(Product("399", "Single", "tr_TR", 122, 904))
+  sorted1.insert(Product("1086", "Woo Album #4", "tr_TR", 203, 606))
+  sorted1.insert(Product("1116", "Patient Ninja", "tr_TR", 470, 298))
+  sorted1.insert(Product("397", "Polo", "tr_TR", 604, 674))
+  sorted1.insert(Product("386", "V-Neck T-Shirt", "tr_TR", 592, 740))
+  assert(sorted1.flatten.map(_.item_id) == List("399", "1086", "1116", "386", "397"))
   println("ok")

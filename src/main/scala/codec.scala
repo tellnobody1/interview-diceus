@@ -3,12 +3,18 @@ package codec
 trait Codec[A]:
   def encode(x: A): IArray[Byte]
   def decode(x: IArray[Byte]): A
+end Codec
 
 import sorted.Node
+import schema.Product
+import argonaut.*, Argonaut.*
 
-given Codec[Node[String]] = new Codec[Node[String]] {
+given Codec[Node[Product]] = new Codec[Node[Product]] {
   import proto.*
-  given MessageCodec[Node[String]] = caseCodecIdx
-  def encode(x: Node[String]): IArray[Byte] = encodeI(x)
-  def decode(x: IArray[Byte]): Node[String] = decodeI(x)
+  given MessageCodec[Product] = caseCodecIdx
+  given MessageCodec[Node[Product]] = caseCodecIdx
+  def encode(x: Node[Product]): IArray[Byte] = encodeI(x)
+  def decode(x: IArray[Byte]): Node[Product] = decodeI(x)
 }
+
+given DecodeJson[Product] = jdecode5L(Product.apply)("item_id", "name", "locale", "click", "purchase")

@@ -6,6 +6,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" % "akka-actor-typed_2.13" % "2.6.14"
 , "com.typesafe.akka" % "akka-stream_2.13" % "2.6.14"
 , "com.typesafe.akka" % "akka-http_2.13" % "10.2.4"
+, "io.argonaut" %% "argonaut" % "6.3.3"
 )
 
 dependsOn(proto)
@@ -13,6 +14,7 @@ dependsOn(proto)
 lazy val proto = project.in(file("deps/proto/proto")).settings(
   scalaVersion := "3.0.0"
 , libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.17.0"
+, test := {}
 ).dependsOn(protoops)
 
 lazy val protoops = project.in(file("deps/proto/ops")).settings(

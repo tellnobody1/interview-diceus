@@ -7,25 +7,25 @@ import akka.http.scaladsl.model.{HttpResponse, HttpMethod}
 import scala.concurrent.{Future, ExecutionContext}
 
 import http.*
-import stream.*
-
-class Product
-  ( item_id: String
-  , name: String
-  , locale: String
-  , click: Long
-  , purchase: Long
-  )
+import sorted.Sorted
+import store.Store
+import schema.Product
+import codec.given
 
 @main def run(): Unit =
   given system: ActorSystem[Unit] = ActorSystem(Behaviors.empty, "click")
   given ExecutionContext = system.executionContext
 
+  val sorted1 = Sorted[Product, Long](Store())(_.click)
+
   val b = Binder()
   val bf =
     b.bind{
       case Request(POST, Root / "fetch") =>
-        json("https://insider-sample-data.s3-eu-west-1.amazonaws.com/scala-api-design/sample.json").map{ _ =>
+        stream.json(
+          "https://insider-sample-data.s3-eu-west-1.amazonaws.com/scala-api-design/sample.json"
+        , p => sorted1.insert(p)
+        ).map{ _ =>
           HttpResponse(status=OK)
         }
       case Request(GET, (Root / "products") ? ("configId" * x & "size" * y & "page" * z)) =>
@@ -37,4 +37,4 @@ class Product
     b.unbind(bf)
   }
 
-given CanEqual[HttpMethod, HttpMethod] = CanEqual.derived
+  given CanEqual[HttpMethod, HttpMethod] = CanEqual.derived
