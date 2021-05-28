@@ -8,6 +8,21 @@ libraryDependencies ++= Seq(
 , "com.typesafe.akka" % "akka-http-core_2.13" % "10.2.4"
 )
 
+dependsOn(proto)
+
+lazy val proto = project.in(file("deps/proto/proto")).settings(
+  scalaVersion := "3.0.0"
+, libraryDependencies += "com.google.protobuf" % "protobuf-java" % "3.17.0"
+).dependsOn(protoops)
+
+lazy val protoops = project.in(file("deps/proto/ops")).settings(
+  scalaVersion := "3.0.0"
+).dependsOn(protosyntax)
+
+lazy val protosyntax = project.in(file("deps/proto/syntax")).settings(
+  scalaVersion := "3.0.0"
+)
+
 scalacOptions := Seq(
   "-encoding", "UTF-8"
 , "-language:strictEquality", "-language:postfixOps"
