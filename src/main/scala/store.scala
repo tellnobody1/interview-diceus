@@ -10,7 +10,6 @@ type Key = IArray[Byte]
 class Store[V](using vc: Codec[V]):
   private val next = AtomicInteger(0)
   private val storage = ConcurrentHashMap[Bytes, IArray[Byte]]()
-  private def i2b(i: Int): Key = IArray.unsafeFromArray(BigInt(i).toByteArray)
 
   def add(v: V): Key =
     val k = i2b(next.incrementAndGet())
@@ -27,13 +26,15 @@ class Store[V](using vc: Codec[V]):
 
   val head: Key = i2b(1)
 
+  private def i2b(i: Int): Key = IArray.unsafeFromArray(BigInt(i).toByteArray)
+
   given [A]: CanEqual[A, A | Null] = CanEqual.derived
 
-class Bytes(val array: IArray[Byte]) {
-  override def equals(other: Any): Boolean =
-    if other.isInstanceOf[Bytes] then
-      val o = other.asInstanceOf[Bytes]
-      Arrays.equals(array.toArray: Array[Byte], o.array.toArray: Array[Byte])
-    else false
-  override def hashCode(): Int = Arrays.hashCode(array.toArray: Array[Byte])
-}
+  class Bytes(val array: IArray[Byte]):
+    override def equals(other: Any): Boolean =
+      if other.isInstanceOf[Bytes] then
+        val o = other.asInstanceOf[Bytes]
+        Arrays.equals(array.toArray: Array[Byte], o.array.toArray: Array[Byte])
+      else false
+    override def hashCode(): Int = Arrays.hashCode(array.toArray: Array[Byte])
+  end Bytes
