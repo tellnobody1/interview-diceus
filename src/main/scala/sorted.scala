@@ -42,16 +42,16 @@ class Sorted[A, I: Ordering](store: Store[Node[A]])(index: A => I):
           case Some(node1) =>
             insert(x, node1, s)
 
-  def flatten: List[A] = flatten(store.head)
+  def flatten: LazyList[A] = flatten(store.head)
 
-  private def flatten(nodeKey: Key): List[A] =
+  private def flatten(nodeKey: Key): LazyList[A] =
     store.get(nodeKey) match
-      case None => Nil
-      case Some(Node(t, x, s)) => flatten(t) ++ List(x) ++ flatten(s)
+      case None => LazyList.empty
+      case Some(Node(t, x, s)) => flatten(t) #::: LazyList(x) #::: flatten(s)
 
-  inline private def flatten(nodeKey: Option[Key]): List[A] =
+  inline private def flatten(nodeKey: Option[Key]): LazyList[A] =
     nodeKey match
-      case None => Nil
+      case None => LazyList.empty
       case Some(nodeKey) => flatten(nodeKey)
 
   inline private def newNode[A](x: A): Node[A] = Node(None, x, None)

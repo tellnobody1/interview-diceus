@@ -18,9 +18,9 @@ def json(uri: String, f: Product => Unit)(using ActorSystem[Unit], ExecutionCont
     response.entity.dataBytes
       .via(jsonStreamingSupport.framingDecoder)
       .mapAsync(1){ bytes =>
-        import argonaut.*, Argonaut.*
-        new String(bytes.toArray, "utf8").decodeOption[Product] match
-          case None => Future.failed[Unit](throw new RuntimeException("bad json"))
+        import argonaut.Argonaut.*
+        String(bytes.toArray, "utf8").decodeOption[Product] match
+          case None => Future.failed(throw new RuntimeException("bad json"))
           case Some(p) =>
             f(p)
             Future.successful(())

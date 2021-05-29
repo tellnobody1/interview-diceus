@@ -18,3 +18,4 @@ given Codec[Node[Product]] = new Codec[Node[Product]] {
 }
 
 given DecodeJson[Product] = jdecode5L(Product.apply)("item_id", "name", "locale", "click", "purchase")
+given EncodeJson[Product] = jencode5L((p: Product) => (p.item_id, p.name, p.locale, p.click, p.purchase))("item_id", "name", "locale", "click", "purchase")
