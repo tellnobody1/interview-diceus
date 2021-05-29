@@ -10,7 +10,7 @@ import scala.concurrent.{Future, ExecutionContext}
 
 import http.*
 import sorted.{Sorted, Node}
-import store.Store
+import store.MemStore
 import schema.Product
 import codec.given
 
@@ -18,8 +18,8 @@ import codec.given
   given system: ActorSystem[Unit] = ActorSystem(Behaviors.empty, "click")
   given ExecutionContext = system.executionContext
 
-  val sorted1 = new Sorted[Product, Long](_.click) with Store[Node[Product]]
-  val sorted2 = new Sorted[Product, Long](_.purchase) with Store[Node[Product]]
+  val sorted1 = Sorted[Product, Long](_.click)(MemStore())
+  val sorted2 = Sorted[Product, Long](_.purchase)(MemStore())
 
   val bf = Http().newServerAt("0.0.0.0", 8080).bind{
     case Request(POST, Root / "fetch") =>
