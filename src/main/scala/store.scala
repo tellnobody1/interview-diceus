@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.Arrays
 
-import schema.Prod
+import schema.{Prod, ItemId}
 
 /* Database API */
 trait Dba:
@@ -23,7 +23,7 @@ end Dba
 class MemStore extends Dba:
   private val next = AtomicInteger(0)
   private val db = ConcurrentHashMap[Key, Node]()
-  private val index = ConcurrentHashMap[Prod, Key]()
+  private val index = ConcurrentHashMap[ItemId, Key]()
 
   def add(v: Node): Key =
     val k = next.incrementAndGet()
@@ -32,7 +32,7 @@ class MemStore extends Dba:
 
   def put(k: Key, v: Node): Unit =
     db.put(k, v)
-    index.put(v.x, k)
+    index.put(v.x.itemId, k)
 
   def get(k: Key): Option[Node] =
     Option(db.get(k)).map(_.nn)
@@ -40,7 +40,7 @@ class MemStore extends Dba:
   def head: Key = 1
 
   def key(v: Prod): Option[Key] =
-    Option(index.get(v)).map(_.nn)
+    Option(index.get(v.itemId)).map(_.nn)
 
   def rem(k: Key): Unit =
     get(k) match

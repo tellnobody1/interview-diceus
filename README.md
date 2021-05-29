@@ -97,3 +97,9 @@ no problem to replace implementation with any other library.
 
 I find proposed DSL is awkard and not native to Scala. I prefer match-case style of
 defining of REST API. That's why small DSL was implemented for request matching.
+
+### Overwrite Data
+
+It is obviuos that in some moment the data will be updated. It means that data should
+not be treated as new if it has the same 'item_id'. It is not stated that 'item_id' is
+unique but we will treat it as unique in this design.

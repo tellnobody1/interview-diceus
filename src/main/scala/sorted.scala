@@ -12,7 +12,8 @@ class Sorted[I: Ordering](index: Prod => I)(dba: store.Dba):
   def insert(x: Prod): Unit =
     dba.key(x) match
       case None =>
-      case Some(k) => dba.rem(k)
+      case Some(k) =>
+        dba.rem(k)
     dba.get(dba.head) match
       case None => dba.add(toNode(x))
       case Some(node) => insert(x, node, dba.head)
@@ -60,15 +61,15 @@ class Sorted[I: Ordering](index: Prod => I)(dba: store.Dba):
 
 // @main
 def test(): Unit =
-  import schema.Prod
+  import schema.{Prod, ItemId, get}
   import store.MemStore
   val sorted1 = Sorted[Long](_.click)(MemStore())
-  sorted1.insert(Prod("399", "Single", "tr_TR", 122, 904))
-  sorted1.insert(Prod("1086", "Woo Album #4", "tr_TR", 203, 606))
-  sorted1.insert(Prod("1116", "Patient Ninja", "tr_TR", 470, 298))
-  sorted1.insert(Prod("397", "Polo", "tr_TR", 604, 674))
-  sorted1.insert(Prod("386", "V-Neck T-Shirt", "tr_TR", 592, 740))
-  assert(sorted1.flatten.map(_.item_id) == List("399", "1086", "1116", "386", "397"))
-  // sorted1.insert(Prod("1086", "Woo Album #4", "tr_TR", 1203, 606))
-  // assert(sorted1.flatten.map(_.item_id) == List("399", "1116", "386", "397", "1086"))
+  sorted1.insert(Prod(ItemId("399"), "Single", "tr_TR", 122, 904))
+  sorted1.insert(Prod(ItemId("1086"), "Woo Album #4", "tr_TR", 203, 606))
+  sorted1.insert(Prod(ItemId("1116"), "Patient Ninja", "tr_TR", 470, 298))
+  sorted1.insert(Prod(ItemId("397"), "Polo", "tr_TR", 604, 674))
+  sorted1.insert(Prod(ItemId("386"), "V-Neck T-Shirt", "tr_TR", 592, 740))
+  assert(sorted1.flatten.map(_.itemId.get).toList == List("399", "1086", "1116", "386", "397"))
+  sorted1.insert(Prod(ItemId("1086"), "Woo Album #4", "tr_TR", 1203, 606))
+  assert(sorted1.flatten.map(_.itemId.get).toList == List("399", "1116", "386", "397", "1086"))
   println("OK.")
