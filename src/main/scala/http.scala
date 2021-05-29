@@ -1,27 +1,7 @@
 package http
 
-import akka.Done
-import akka.actor.typed.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.model.HttpMethod
-import akka.http.scaladsl.model.StatusCodes.NotImplemented
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
+import akka.http.scaladsl.model.{HttpMethod, HttpRequest}
 import scala.annotation.tailrec
-import scala.concurrent.{Future, ExecutionContext}
-
-class Binder(using ActorSystem[Unit]):
-  type R = PartialFunction[HttpRequest, Future[HttpResponse]]
-
-  def bind(route: R)(port: Int): Future[ServerBinding] =
-    Http().newServerAt("0.0.0.0", port).bind(route orElse {
-      case _ => Future.successful(HttpResponse(status=NotImplemented))
-    })
-
-  def unbind(bf: Future[ServerBinding])(using ExecutionContext): Future[Done] =
-    bf.flatMap(_.unbind)
-
-end Binder
 
 object Request:
   def unapply(x: HttpRequest): Option[(HttpMethod, String)] =
