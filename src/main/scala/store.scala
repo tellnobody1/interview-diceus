@@ -3,47 +3,50 @@ package store
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.Arrays
-import codec.Codec
+
+import schema.Prod
 
 /* Database API */
-trait Dba[V] {
-  def add(v: V): IArray[Byte]
-  def put(k: IArray[Byte], v: V): Unit
-  def get(k: IArray[Byte]): Option[V]
-  val head: IArray[Byte]
-}
+trait Dba:
+  type Key = Int
+  
+  case class Node(left: Option[Key], x: Prod, right: Option[Key], active: Boolean)
+  
+  def add(v: Node): Key
+  def put(k: Key, v: Node): Unit
+  def get(k: Key): Option[Node]
+  def head: Key
+  def key(v: Prod): Option[Key]
+  def rem(k: Key): Unit
+end Dba
 
-class MemStore[V](using vc: Codec[V]) extends Dba[V]:
+class MemStore extends Dba:
   private val next = AtomicInteger(0)
-  private val storage = ConcurrentHashMap[Bytes, IArray[Byte]]()
-  private val index = ConcurrentHashMap[Bytes, Bytes]()
+  private val db = ConcurrentHashMap[Key, Node]()
+  private val index = ConcurrentHashMap[Prod, Key]()
 
-  def add(v: V): IArray[Byte] =
-    val k = i2b(next.incrementAndGet())
+  def add(v: Node): Key =
+    val k = next.incrementAndGet()
     put(k, v)
     k
 
-  def put(k: IArray[Byte], v: V): Unit =
-    storage.put(Bytes(k), vc.encode(v))
-    index.put(Bytes(vc.encode(v)), Bytes(k))
+  def put(k: Key, v: Node): Unit =
+    db.put(k, v)
+    index.put(v.x, k)
 
-  def get(k: IArray[Byte]): Option[V] =
-    val x = storage.get(Bytes(k))
-    if x == null then None
-    else Some(vc.decode(x))
+  def get(k: Key): Option[Node] =
+    Option(db.get(k)).map(_.nn)
 
-  val head: IArray[Byte] = i2b(1)
+  def head: Key = 1
 
-  private def i2b(i: Int): IArray[Byte] = IArray.unsafeFromArray(BigInt(i).toByteArray)
+  def key(v: Prod): Option[Key] =
+    Option(index.get(v)).map(_.nn)
+
+  def rem(k: Key): Unit =
+    get(k) match
+      case Some(v) if v.active =>
+        db.put(k, v.copy(active=false))
+      case _ =>
 
   given [A]: CanEqual[A, A | Null] = CanEqual.derived
 end MemStore
-
-class Bytes(val array: IArray[Byte]):
-  override def equals(other: Any): Boolean =
-    if other.isInstanceOf[Bytes] then
-      val o = other.asInstanceOf[Bytes]
-      Arrays.equals(array.toArray: Array[Byte], o.array.toArray: Array[Byte])
-    else false
-  override def hashCode(): Int = Arrays.hashCode(array.toArray: Array[Byte])
-end Bytes

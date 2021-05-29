@@ -5,7 +5,6 @@
 ```sh
 gh repo clone tellnobody1/scaling-invention
 cd scaling-invention
-git submodule update --init --remote --recursive
 sbt run
 curl -v -X POST "http://localhost:8080/fetch"
 curl -v "http://localhost:8080/products?configId=1&size=5&page=1"
@@ -85,9 +84,9 @@ to use descending order or both.
 
 ### Codecs
 
-For storage Protobuf is used. To save more data LZ4 compression should be added.
-To work with Protobuf I've added small library which creates codecs based on
-Scala class using macros.
+Storage is implemented in-memory and for the sake of simplicity doesn't use encoding.
+But it is easy to save key and values as bytes. I will use for that Protobuf with LZ4
+compression.
 
 For working with JSON it used Argonaut. It tradeoffs speed for readiness. It could be
 replaced with Jackson, for example. But at the moment, Jackson doesn't support Scala 3

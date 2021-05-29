@@ -8,17 +8,17 @@ import akka.stream.scaladsl.{Source, Sink}
 import akka.{Done, NotUsed}
 import scala.concurrent.{Future, ExecutionContext}
 
-import schema.Product
+import schema.Prod
 import codec.given
 
-def json(uri: String)(using ActorSystem[Unit], ExecutionContext): Future[Source[Product, Any]] =
+def json(uri: String)(using ActorSystem[Unit], ExecutionContext): Future[Source[Prod, Any]] =
   Http().singleRequest(HttpRequest(uri=uri)).map{ response =>
     given jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
     response.entity.dataBytes
       .via(jsonStreamingSupport.framingDecoder)
       .mapAsync(1){ bytes =>
         import argonaut.Argonaut.*
-        String(bytes.toArray, "utf8").decodeOption[Product] match
+        String(bytes.toArray, "utf8").decodeOption[Prod] match
           case None => Future.failed(new RuntimeException("bad json"))
           case Some(p) => Future(p)
       }

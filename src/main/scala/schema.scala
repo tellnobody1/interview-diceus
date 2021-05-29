@@ -1,6 +1,6 @@
 package schema
 
-case class Product
+case class Prod
   ( item_id: String
   , name: String
   , locale: String
