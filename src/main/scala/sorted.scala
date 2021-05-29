@@ -5,47 +5,45 @@ import scala.annotation.tailrec
 import scala.math.Ordering
 import scala.math.Ordering.Implicits.infixOrderingOps
 
-type Key = store.Key
-case class Node[A](left: Option[Key], x: A, right: Option[Key])
+case class Node[A](left: Option[IArray[Byte]], x: A, right: Option[IArray[Byte]])
 
-class Sorted[A, I: Ordering](store: Store[Node[A]])(index: A => I):
+trait Sorted[A, I: Ordering](index: A => I) extends store.Dba[Node[A]]:
 
   def insert(x: A): Unit =
-    store.get(store.head) match
-      case None => store.add(newNode(x))
-      case Some(node) => insert(x, node, store.head)
+    get(head) match
+      case None => add(newNode(x))
+      case Some(node) => insert(x, node, head)
 
-  @tailrec
-  private def insert(x: A, node: Node[A], nodeKey: Key): Unit =
+  @tailrec private def insert(x: A, node: Node[A], nodeKey: Key): Unit =
     node match
       case Node(None, y, _) if index(x) <= index(y) =>
-        val k = store.add(newNode(x))
-        store.put(nodeKey, node.copy(left=Some(k)))
+        val k = add(newNode(x))
+        put(nodeKey, node.copy(left=Some(k)))
 
       case Node(Some(t), y, _) if index(x) <= index(y) =>
-        store.get(t) match
+        get(t) match
           case None =>
-            val k = store.add(newNode(x))
-            store.put(nodeKey, node.copy(left=Some(k)))
+            val k = add(newNode(x))
+            put(nodeKey, node.copy(left=Some(k)))
           case Some(node1) =>
             insert(x, node1, t)
 
       case Node(_, _, None) =>
-        val k = store.add(newNode(x))
-        store.put(nodeKey, node.copy(right=Some(k)))
+        val k = add(newNode(x))
+        put(nodeKey, node.copy(right=Some(k)))
 
       case Node(_, _, Some(s)) =>
-        store.get(s) match
+        get(s) match
           case None =>
-            val k = store.add(newNode(x))
-            store.put(nodeKey, node.copy(right=Some(k)))
+            val k = add(newNode(x))
+            put(nodeKey, node.copy(right=Some(k)))
           case Some(node1) =>
             insert(x, node1, s)
 
-  def flatten: LazyList[A] = flatten(store.head)
+  def flatten: LazyList[A] = flatten(head)
 
   private def flatten(nodeKey: Key): LazyList[A] =
-    store.get(nodeKey) match
+    get(nodeKey) match
       case None => LazyList.empty
       case Some(Node(t, x, s)) => flatten(t) #::: LazyList(x) #::: flatten(s)
 
@@ -62,7 +60,7 @@ class Sorted[A, I: Ordering](store: Store[Node[A]])(index: A => I):
 def test(): Unit =
   import codec.{Codec, given}
   import schema.Product
-  val sorted1 = Sorted[Product, Long](Store())(_.click)
+  val sorted1 = new Sorted[Product, Long](_.click) with Store[Node[Product]]
   sorted1.insert(Product("399", "Single", "tr_TR", 122, 904))
   sorted1.insert(Product("1086", "Woo Album #4", "tr_TR", 203, 606))
   sorted1.insert(Product("1116", "Patient Ninja", "tr_TR", 470, 298))

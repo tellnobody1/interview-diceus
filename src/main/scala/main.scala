@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpResponse, HttpMethod, HttpEntity, ContentTy
 import scala.concurrent.{Future, ExecutionContext}
 
 import http.*
-import sorted.Sorted
+import sorted.{Sorted, Node}
 import store.Store
 import schema.Product
 import codec.given
@@ -18,8 +18,8 @@ import codec.given
   given system: ActorSystem[Unit] = ActorSystem(Behaviors.empty, "click")
   given ExecutionContext = system.executionContext
 
-  val sorted1 = Sorted[Product, Long](Store())(_.click)
-  val sorted2 = Sorted[Product, Long](Store())(_.purchase)
+  val sorted1 = new Sorted[Product, Long](_.click) with Store[Node[Product]]
+  val sorted2 = new Sorted[Product, Long](_.purchase) with Store[Node[Product]]
 
   val bf = Http().newServerAt("0.0.0.0", 8080).bind{
     case Request(POST, Root / "fetch") =>

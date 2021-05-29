@@ -5,9 +5,16 @@ import java.util.concurrent.atomic.AtomicInteger
 import java.util.Arrays
 import codec.Codec
 
-type Key = IArray[Byte]
+/* Database API */
+trait Dba[V] {
+  type Key = IArray[Byte]
+  def add(v: V): Key
+  def put(k: Key, v: V): Unit
+  def get(k: Key): Option[V]
+  val head: Key
+}
 
-class Store[V](using vc: Codec[V]):
+trait Store[V](using vc: Codec[V]) extends Dba[V]:
   private val next = AtomicInteger(0)
   private val storage = ConcurrentHashMap[Bytes, IArray[Byte]]()
 
