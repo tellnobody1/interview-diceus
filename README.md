@@ -1,5 +1,19 @@
 # scaling-invention
 
+Test task from DICEUS on Scala Developer position in Kyiv, Ukraine.
+
+## Task
+
+See [task.pdf](task.pdf).
+
+## Official Feedback
+
+```
+Here is feedback - Unfortunately negative, There is shame and structure code event no pattern files and folder structure. The code itself too mixed.
+
+Thanks for your time and good luck 🙂
+```
+
 ## Run & Test
 
 ```sh
