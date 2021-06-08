@@ -11,7 +11,7 @@ Test task from [DICEUS](http://www.diceus.com/) on [Scala Developer position](ht
 You are given a product data with some additional information like how many times it is clicked. Product data will be given in json format and it should be indexed to Elasticsearch. You are expected to implement a web service with Akka http in order to retrieve products as sorted based on click or purchase. There is a special field (configId) in the given dataset that indicates the configuration for the recommendation field. You need to write this configuration to Redis/RDMS (you can design its data model by yourself and it can be saved manually.).
 
 Steps
-1. Index given data to Elasticsearch. You can download it from here.
+1. Index given data to Elasticsearch. You can download it from [here](https://insider-sample-data.s3-eu-west-1.amazonaws.com/scala-api-design/sample.json).
 2. When request first arrives config id should be checked from Redis or RDMS to understand which field will be used.
 3. Elasticsearch queries should be prepared to get products in sorted order. (size and page needs to be considered.)
 4. If parameters are wrong then the API should return 400 with an error message.
