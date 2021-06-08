@@ -1,16 +1,43 @@
-# scaling-invention
+> Here is feedback - Unfortunately negative, There is shame and structure code event no pattern files and folder structure. The code itself too mixed.
+>
+> Thanks for your time and good luck 🙂
+> 
+> [![logo](logo.png)](http://www.diceus.com/)
 
-Test task from DICEUS on Scala Developer position in Kyiv, Ukraine.
+Test task from [DICEUS](http://www.diceus.com/) on [Scala Developer position](https://jobs.dou.ua/companies/diceus/vacancies/156643/) in Kyiv, Ukraine.
 
 ## Task
 
-See [task.pdf](task.pdf).
+You are given a product data with some additional information like how many times it is clicked. Product data will be given in json format and it should be indexed to Elasticsearch. You are expected to implement a web service with Akka http in order to retrieve products as sorted based on click or purchase. There is a special field (configId) in the given dataset that indicates the configuration for the recommendation field. You need to write this configuration to Redis/RDMS (you can design its data model by yourself and it can be saved manually.).
 
-## Official Feedback
+Steps
+1. Index given data to Elasticsearch. You can download it from here.
+2. When request first arrives config id should be checked from Redis or RDMS to understand which field will be used.
+3. Elasticsearch queries should be prepared to get products in sorted order. (size and page needs to be considered.)
+4. If parameters are wrong then the API should return 400 with an error message.
 
-Here is feedback - Unfortunately negative, There is shame and structure code event no pattern files and folder structure. The code itself too mixed.
+Questions
+1. Which system or service can be used for this web service (Kubernetes, Lambda, Elasticbeanstalk etc.)
+2. If you were expected to write one more endpoint to save config, would you add it to this web service or create another one?
+What are the expected bottlenecks of both systems?
+3. How can this system be scaled for increasing request count and is there any blocking point in your implementation?
 
-Thanks for your time and good luck 🙂
+Data Schema
+| | |
+-|-
+name | Product name
+item_id | Product id
+locale | Product Locale
+click | Click count
+purchase | Purchase Count
+
+Request Parameters
+| | |
+-|-
+configId | If this is set to 1 then products should be sorted based on click. If this is set to 2 then it needs to based on purchase. Other values are
+invalid.
+size | How many products should be retrieved. It is valid between 1 to 10000.
+page | Which page needs to be used.
 
 ## Run & Test
 
