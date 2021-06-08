@@ -34,8 +34,7 @@ purchase | Purchase Count
 Request Parameters
 | | |
 -|-
-configId | If this is set to 1 then products should be sorted based on click. If this is set to 2 then it needs to based on purchase. Other values are
-invalid.
+configId | If this is set to 1 then products should be sorted based on click. If this is set to 2 then it needs to based on purchase. Other values are invalid.
 size | How many products should be retrieved. It is valid between 1 to 10000.
 page | Which page needs to be used.
 
